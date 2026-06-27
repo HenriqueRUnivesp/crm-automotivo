@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM Automotivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="bg-black">
+      <img
+        src="{{ url_for('static', filename='images/Della.jpg') }}"
+        alt="Della Automóveis"
+        class="mx-auto h-auto w-full max-w-7xl object-contain"
+      >
+    </div>
+
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight sm:text-2xl">CRM Automotivo</h1>
+        <p class="text-sm text-slate-500">Painel de atendimento e vendas</p>
+      </div>
+
+      <a
+        href="{{ url_for('cadastrar_lead') }}"
+        class="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+      >
+        + Cadastrar Lead Manual
+      </a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    {% set colunas = [
+      {
+        "titulo": "Novos Leads",
+        "status": "Novo",
+        "cor_topo": "bg-blue-500",
+        "cor_badge": "bg-blue-50 text-blue-700 ring-blue-600/20",
+        "proximo": "Em Atendimento"
+      },
+      {
+        "titulo": "Em Atendimento",
+        "status": "Em Atendimento",
+        "cor_topo": "bg-orange-500",
+        "cor_badge": "bg-orange-50 text-orange-700 ring-orange-600/20",
+        "proximo": "Visita Agendada"
+      },
+      {
+        "titulo": "Visita Agendada",
+        "status": "Visita Agendada",
+        "cor_topo": "bg-purple-500",
+        "cor_badge": "bg-purple-50 text-purple-700 ring-purple-600/20",
+        "proximo": "Concluído / Venda"
+      },
+      {
+        "titulo": "Concluído / Venda",
+        "status": "Concluído / Venda",
+        "cor_topo": "bg-green-500",
+        "cor_badge": "bg-green-50 text-green-700 ring-green-600/20",
+        "proximo": ""
+      }
+    ] %}
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      {% for coluna in colunas %}
+        {% set total_coluna = namespace(valor=0) %}
+        {% for lead in leads %}
+          {% if lead.status_funil == coluna.status %}
+            {% set total_coluna.valor = total_coluna.valor + 1 %}
+          {% endif %}
+        {% endfor %}
+
+        <div class="min-h-[420px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+          <div class="h-1.5 {{ coluna.cor_topo }}"></div>
+
+          <div class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+            <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">{{ coluna.titulo }}</h2>
+            <span class="rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset {{ coluna.cor_badge }}">
+              {{ total_coluna.valor }}
+            </span>
+          </div>
+
+          <div class="space-y-3 p-3">
+            {% for lead in leads %}
+              {% if lead.status_funil == coluna.status %}
+                <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <div class="mb-3 flex items-start justify-between gap-3">
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 ring-1 ring-inset ring-slate-200">
+                      {{ lead.origem }}
+                    </span>
+                    <span class="text-xs text-slate-400">
+                      #{{ lead.id }}
+                    </span>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <h3 class="text-base font-bold leading-tight text-slate-950">{{ lead.nome }}</h3>
+                    <p class="text-sm leading-5 text-slate-600">
+                      {% if lead.veiculo %}
+                        {{ lead.veiculo.modelo }}
+                      {% elif lead.veiculo_interesse %}
+                        {{ lead.veiculo_interesse }} <span class="text-xs text-slate-400">(não vinculado)</span>
+                      {% else %}
+                        Veículo de interesse não vinculado
+                      {% endif %}
+                    </p>
+                  </div>
+
+                  <div class="mt-4 grid gap-2">
+                    <a
+                      href="https://wa.me/{{ lead.telefone }}?text=Ol%C3%A1+{{ lead.nome|urlencode }},+vi+seu+interesse+no+carro+pelo+portal..."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex w-full items-center justify-center rounded-md bg-green-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
+                    >
+                      Chamar no WhatsApp
+                    </a>
+
+                    <div class="grid grid-cols-2 gap-2">
+                      {% if coluna.proximo %}
+                        <form action="{{ url_for('mudar_status', lead_id=lead.id) }}" method="post">
+                          <input type="hidden" name="status" value="{{ coluna.proximo }}">
+                          <button
+                            type="submit"
+                            class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                          >
+                            Avançar
+                          </button>
+                        </form>
+                      {% else %}
+                        <button
+                          type="button"
+                          class="w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-700"
+                        >
+                          Finalizado
+                        </button>
+                      {% endif %}
+
+                      <a
+                        href="{{ url_for('anotacoes_lead', lead_id=lead.id) }}"
+                        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+                      >
+                        Anotações
+                      </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                      <a
+                        href="{{ url_for('editar_lead', lead_id=lead.id) }}"
+                        class="w-full rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-center text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                      >
+                        Editar
+                      </a>
+
+                      <form
+                        action="{{ url_for('excluir_lead', lead_id=lead.id) }}"
+                        method="post"
+                        onsubmit="return confirm('Deseja excluir este lead? Esta ação não pode ser desfeita.');"
+                      >
+                        <button
+                          type="submit"
+                          class="w-full rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
+                        >
+                          Excluir
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </article>
+              {% endif %}
+            {% endfor %}
+
+            {% if total_coluna.valor == 0 %}
+              <div class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-8 text-center">
+                <p class="text-sm font-medium text-slate-500">Nenhum lead nesta etapa.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anotações - CRM Automotivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">Anotações</h1>
+        <p class="text-sm text-slate-500">{{ lead.nome }} · {{ lead.telefone }}</p>
+      </div>
+
+      <a href="{{ url_for('index') }}" class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+        Voltar
+      </a>
+    </div>
+  </header>
+
+  <main class="mx-auto grid max-w-3xl gap-5 px-4 py-6 sm:px-6">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <form action="{{ url_for('anotacoes_lead', lead_id=lead.id) }}" method="post" class="grid gap-3">
+        <label for="descricao" class="text-sm font-semibold text-slate-700">Nova anotação</label>
+        <textarea id="descricao" name="descricao" rows="4" required class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"></textarea>
+        <div class="flex justify-end">
+          <button type="submit" class="rounded-md bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700">
+            Salvar Anotação
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h2 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-700">Histórico</h2>
+      <div class="space-y-3">
+        {% for item in historicos %}
+          <article class="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-sm text-slate-800">{{ item.descricao }}</p>
+            <p class="mt-1 text-xs text-slate-500">{{ item.data_registro.strftime("%d/%m/%Y %H:%M") }}</p>
+          </article>
+        {% else %}
+          <p class="text-sm text-slate-500">Nenhuma anotação registrada.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

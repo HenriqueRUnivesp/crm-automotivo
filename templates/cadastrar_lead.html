@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastrar Lead - CRM Automotivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight">Cadastrar Lead</h1>
+        <p class="text-sm text-slate-500">Inclua um contato manual no funil</p>
+      </div>
+
+      <a
+        href="{{ url_for('index') }}"
+        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+      >
+        Voltar
+      </a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-3xl px-4 py-6 sm:px-6">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      {% if erro %}
+        <div class="mb-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+          {{ erro }}
+        </div>
+      {% endif %}
+
+      <form action="{{ url_for('cadastrar_lead') }}" method="post" class="grid gap-5">
+        <div>
+          <label for="nome" class="mb-1.5 block text-sm font-semibold text-slate-700">Nome do cliente</label>
+          <input
+            id="nome"
+            name="nome"
+            type="text"
+            value="{{ dados.nome if dados else '' }}"
+            required
+            class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          >
+        </div>
+
+        <div>
+          <label for="telefone" class="mb-1.5 block text-sm font-semibold text-slate-700">Telefone / WhatsApp</label>
+          <input
+            id="telefone"
+            name="telefone"
+            type="tel"
+            value="{{ dados.telefone if dados else '' }}"
+            required
+            placeholder="11999999999"
+            class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          >
+        </div>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="origem" class="mb-1.5 block text-sm font-semibold text-slate-700">Origem</label>
+            <select
+              id="origem"
+              name="origem"
+              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+            >
+              {% set origem_atual = dados.origem if dados else 'Manual' %}
+              <option value="Manual" {% if origem_atual == 'Manual' %}selected{% endif %}>Manual</option>
+              <option value="Webmotors" {% if origem_atual == 'Webmotors' %}selected{% endif %}>Webmotors</option>
+              <option value="Mercado Livre" {% if origem_atual == 'Mercado Livre' %}selected{% endif %}>Mercado Livre</option>
+              <option value="Instagram" {% if origem_atual == 'Instagram' %}selected{% endif %}>Instagram</option>
+              <option value="Indicação" {% if origem_atual == 'Indicação' %}selected{% endif %}>Indicação</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="veiculo_interesse" class="mb-1.5 block text-sm font-semibold text-slate-700">Veículo de interesse</label>
+            <input
+              id="veiculo_interesse"
+              name="veiculo_interesse"
+              type="text"
+              value="{{ dados.veiculo_interesse if dados else '' }}"
+              placeholder="Modelo, placa ou ID"
+              class="w-full rounded-md border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+            >
+          </div>
+        </div>
+
+        <div class="flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+          <a
+            href="{{ url_for('index') }}"
+            class="inline-flex justify-center rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+          >
+            Cancelar
+          </a>
+          <button
+            type="submit"
+            class="inline-flex justify-center rounded-md bg-green-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
+          >
+            Salvar Lead
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
